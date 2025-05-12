@@ -6,6 +6,11 @@ const usuarioSchema = new mongoose.Schema({
   nomeResponsavel: String,
   email: { type: String, unique: true },
   senhaHash: String,
+  dataAceitacao: {
+    type: Date,
+    default: null
+
+  }
 });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

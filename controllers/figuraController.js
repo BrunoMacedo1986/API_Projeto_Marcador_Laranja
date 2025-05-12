@@ -2,7 +2,7 @@ const Figura = require('../models/Figura');
 
 exports.criar = async (req, res) => {
   const { codigo, descricao, imagem } = req.body;
-  const figura = new Figura({ codigo, descricao, imagem });
+  const figura = new Figura({ codigo, descricao, imagem, caracteristica1, caracteristica2, caracteristica3 });
   await figura.save();
   res.status(201).json(figura);
 };
