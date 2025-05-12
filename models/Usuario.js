@@ -6,14 +6,10 @@ const usuarioSchema = new mongoose.Schema({
   nomeResponsavel: String,
   email: { type: String, unique: true },
   senhaHash: String,
-  dataLeitura: {
-    type: Date,
-    default: null
-  },
-  dataAceitacao: {
-    type: Date,
-    default: null
-  }
+  leitura: { type: String, enum: ['S', 'N'], required: true },
+  aceitacao: { type: String, enum: ['S', 'N'], required: true },
+  dataLeitura: { type: Date },
+  dataAceitacao: { type: Date }
 });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

@@ -6,7 +6,7 @@ const figuraSchema = new mongoose.Schema({
   imagem: String, // Nome do arquivo salvo
   caracteristica1: String,
   caracteristica2: String,
-  caracteristica3: String
+  caracteristica3: String,
 });
 
 module.exports = mongoose.model('Figura', figuraSchema);

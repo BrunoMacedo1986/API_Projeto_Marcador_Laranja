@@ -8,25 +8,31 @@ exports.registrar = async (req, res) => {
           nomeResponsavel, 
           email, 
           senha, 
-          dataLeitura, 
-          dataAceitacao 
+          leitura, 
+          aceitacao
         } = req.body;
-         if (!nomeCrianca || !idade || !nomeResponsavel || !email || !senha) {
+         if (!nomeCrianca || !idade || !nomeResponsavel || !email || !senha || !leitura || !aceitacao) {
             return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios.' });
           }
-            if (!aceitacao || (aceitacao !== true && aceitacao !== 'S')) {
+            if (aceitacao !== 'S') {
             return res.status(400).json({ mensagem: 'É necessário aceitar os termos para se registrar.' });
+          }
+            if (leitura !== 'S') {
+            return res.status(400).json({ mensagem: 'É necessário confirmar a leitura das instruções.' });
           }
   try {
     const senhaHash = await bcrypt.hash(senha, 10);
-    const dataLeitura = leitura === true || leitura === 'S' ? new Date() : null;
-    const dataAceitacao = new Date();
+    const dataLeitura = leitura === 'S' ? new Date() : null;
+    const dataAceitacao = aceitacao === 'S' ? new Date() : null;
+    
     const usuario = new Usuario({
        nomeCrianca, 
        idade, 
        nomeResponsavel, 
        email, 
-       senhaHash, 
+       senhaHash,
+       leitura,
+       aceitacao,
        dataLeitura, 
        dataAceitacao });
     await usuario.save();
