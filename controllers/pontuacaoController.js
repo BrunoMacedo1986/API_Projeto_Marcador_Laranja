@@ -12,7 +12,7 @@ exports.registrar = async (req, res) => {
 exports.incrementar = async (req, res) => {
   const pontuacao = await Pontuacao.findOneAndUpdate(
     { usuarioId: req.usuarioId },
-    { $inc: { pontos: 1 } },
+    { $inc: { pontos: 10 } },
     { new: true }
   );
   if (!pontuacao) return res.status(404).json({ mensagem: 'Pontuação não encontrada' });
