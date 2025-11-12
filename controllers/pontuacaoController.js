@@ -16,9 +16,11 @@ exports.registrar = async (req, res) => {
 
 exports.incrementar = async (req, res) => {
   try {
+  const {pontos} = req.body;
+  if (pontos == null) return res.status(400).json({mensagem: 'Informe os pontos'});
   const pontuacao = await Pontuacao.findOneAndUpdate(
     { usuarioId: req.usuarioId },
-    { $inc: { pontos: 10 } },
+    { $inc: { pontos: pontos } },
     { new: true }
   );
   if (!pontuacao) 
