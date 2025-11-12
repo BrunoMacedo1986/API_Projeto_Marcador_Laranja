@@ -27,7 +27,7 @@ exports.incrementar = async (req, res) => {
 
     const pontuacao = await Pontuacao.findOneAndUpdate(
       { usuarioId },
-      { $inc: { pontos: pontos } },
+      { $inc: { pontos }, $set: { atualizadoEm: new Date() } },
       { new: true, upsert: true } // upsert cria se não existir
     );
 
