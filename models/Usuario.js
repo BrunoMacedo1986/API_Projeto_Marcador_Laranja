@@ -9,7 +9,8 @@ const usuarioSchema = new mongoose.Schema({
   leitura: { type: String, enum: ['S', 'N'], required: true },
   aceitacao: { type: String, enum: ['S', 'N'], required: true },
   dataLeitura: { type: Date },
-  dataAceitacao: { type: Date }
+  dataAceitacao: { type: Date },
+  pontuacaoTotal: { type: Number, default: 0},
 });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);
