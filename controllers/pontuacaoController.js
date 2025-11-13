@@ -1,4 +1,5 @@
 const Pontuacao = require('../models/Pontuacao');
+const Pontuacao = require('../models/Usuario');
 
 exports.registrar = async (req, res) => {
   try {
@@ -18,36 +19,37 @@ exports.registrar = async (req, res) => {
 };
 
 exports.incrementar = async (req, res) => {
+  const { pontos } = req.body;
+  const usuarioId = req.usuarioId;
+
   try {
-    const usuarioId = req.usuarioId || req.body.usuarioId;
-    const { pontos } = req.body;
+    const usuario = await Usuario.findById(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
 
-    if (!usuarioId) return res.status(400).json({ mensagem: 'Usuário não informado' });
-    if (pontos == null) return res.status(400).json({ mensagem: 'Informe os pontos' });
+    usuario.pontuacaoTotal += pontos;
+    await usuario.save();
 
-    const pontuacao = await Pontuacao.findOneAndUpdate(
-      { usuarioId },
-      { $inc: { pontos }, $set: { atualizadoEm: new Date() } },
-      { new: true, upsert: true } // upsert cria se não existir
-    );
+    res.json({
+      mensagem: "Pontuação atualizada",
+      pontuacaoTotal: usuario.pontuacaoTotal
+    });
 
-    res.json(pontuacao);
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
 };
 
 exports.consultar = async (req, res) => {
-  try {
-    const usuarioId = req.usuarioId || req.query.usuarioId;
-    if (!usuarioId) return res.status(400).json({ mensagem: 'Usuário não informado' });
+  const usuarioId = req.usuarioId;
+  const usuario = await Usuario.findById(usuarioId);
 
-    const pontuacao = await Pontuacao.findOne({ usuarioId });
-    if (!pontuacao)
-      return res.status(404).json({ mensagem: 'Pontuação não encontrada' });
-
-    res.json(pontuacao);
-  } catch (err) {
-    res.status(500).json({ erro: err.message });
+  if (!usuario) {
+    return res.status(404).json({ mensagem: "Usuário não encontrado" });
   }
+
+  res.json({
+    pontuacaoTotal: usuario.pontuacaoTotal
+  });
 };
