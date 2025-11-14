@@ -26,19 +26,14 @@ exports.incrementar = async (req, res) => {
     const usuarioId = req.usuarioId;
     const { pontos } = req.body;
 
-    if (!pontos || pontos <= 0) {
-      return res.status(400).json({ mensagem: "Informe pontos válidos" });
+    if (pontos === undefined) {
+      return res.status(400).json({ mensagem: "Informe os pontos" });
     }
 
     // Atualiza os campos pontuacaoTotal e pontuacaoAcum do usuário
-    const usuario = await Usuario.findByIdAndUpdate(
+      const usuario = await Usuario.findByIdAndUpdate(
       usuarioId,
-      { 
-        $inc: { 
-          pontuacaoTotal: pontos, 
-          pontuacaoAcum: pontos 
-        } 
-      },
+      { $inc: { pontuacaoAcum: pontos } },
       { new: true }
     );
 
@@ -47,14 +42,11 @@ exports.incrementar = async (req, res) => {
     }
 
     // Registrar histórico na collection Pontuacao
-    await Pontuacao.create({
-      usuarioId,
-      pontos
-    });
+    await Pontuacao.create({ usuarioId, pontos });
 
     res.json({
       mensagem: "Pontuação atualizada",
-      pontuacaoTotal: usuario.pontuacaoTotal,
+      pontuacaoTotal: usuario.pontuacaoTotal ?? 0,
       pontuacaoAcum: usuario.pontuacaoAcum
     });
 
