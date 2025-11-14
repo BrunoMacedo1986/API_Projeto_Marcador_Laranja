@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const mongoose = require('mongoose');
-const cors = require('cors')
+const cors = require('cors');
+const pontuacaoRoutes = require('./routes/pontuacaoRoutes');
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB conectado'))
