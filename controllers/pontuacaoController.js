@@ -33,7 +33,7 @@ exports.incrementar = async (req, res) => {
       return res.status(400).json({ mensagem: "Informe os pontos" });
     }
 
-    // Atualiza no usuário (pontuação acumulada)
+    // Atualiza a pontuação acumulada do usuário
     const usuario = await Usuario.findByIdAndUpdate(
       usuarioId,
       { $inc: { pontuacaoTotal: pontos } },
@@ -44,7 +44,7 @@ exports.incrementar = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    // Registrar histórico na collection pontuacaos
+    // Registrar histórico no collection Pontuacao
     await Pontuacao.create({
       usuarioId,
       pontos
@@ -59,7 +59,6 @@ exports.incrementar = async (req, res) => {
     res.status(500).json({ erro: err.message });
   }
 };
-
 
 // Consultar pontuação acumulada
 exports.consultar = async (req, res) => {
