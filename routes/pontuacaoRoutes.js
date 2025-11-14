@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const pontuacaoController = require('../controllers/pontuacaoController');
-const auth = require('../middleware/auth');
+const auth = require('../middleware/authMiddleware');
 
 // Registrar pontuação inicial (opcional – usado quando um usuário é criado)
 router.post('/registrar', auth, pontuacaoController.registrar);
