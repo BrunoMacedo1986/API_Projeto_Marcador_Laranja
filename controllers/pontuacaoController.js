@@ -1,39 +1,57 @@
-const Pontuacao = require('../models/Pontuacao');
-const Pontuacao = require('../models/Usuario');
+const Usuario = require('../models/Usuario');
 
+// Registrar pontuação inicial para novo usuário
 exports.registrar = async (req, res) => {
   try {
-    const usuarioId = req.usuarioId || req.body.usuarioId; // pegar do middleware ou do body
-    if (!usuarioId) return res.status(400).json({ mensagem: 'Usuário não informado' });
+    const usuarioId = req.usuarioId || req.body.usuarioId;
+    if (!usuarioId) {
+      return res.status(400).json({ mensagem: 'Usuário não informado' });
+    }
 
     const existente = await Pontuacao.findOne({ usuarioId });
-    if (existente) 
+    if (existente) {
       return res.status(400).json({ mensagem: 'Pontuação já existe' });
+    }
 
     const nova = new Pontuacao({ usuarioId, pontos: 0 });
     await nova.save();
+
     res.status(201).json(nova);
+
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
 };
 
-exports.incrementar = async (req, res) => {
-  const { pontos } = req.body;
-  const usuarioId = req.usuarioId;
 
+/// Incrementar pontos acumulados
+exports.incrementar = async (req, res) => {
   try {
-    const usuario = await Usuario.findById(usuarioId);
-    if (!usuario) {
-      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    const { pontos } = req.body;
+    const usuarioId = req.body.usuarioId || req.usuarioId;
+
+    if (!usuarioId) {
+      return res.status(400).json({ mensagem: 'Usuário não informado' });
     }
 
-    usuario.pontuacaoTotal += pontos;
-    await usuario.save();
+    let pontuacao = await Pontuacao.findOne({ usuarioId });
+
+    // Se não existir registro, criar um
+    if (!pontuacao) {
+      pontuacao = new Pontuacao({
+        usuarioId,
+        pontos: 0
+      });
+    }
+
+    pontuacao.pontos += pontos;
+    pontuacao.atualizadoEm = new Date();
+
+    await pontuacao.save();
 
     res.json({
       mensagem: "Pontuação atualizada",
-      pontuacaoTotal: usuario.pontuacaoTotal
+      pontos: pontuacao.pontos
     });
 
   } catch (err) {
@@ -41,15 +59,23 @@ exports.incrementar = async (req, res) => {
   }
 };
 
+
+/// Consultar pontuação acumulada
 exports.consultar = async (req, res) => {
-  const usuarioId = req.usuarioId;
-  const usuario = await Usuario.findById(usuarioId);
+  try {
+    const usuarioId = req.query.usuarioId || req.usuarioId;
 
-  if (!usuario) {
-    return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    if (!usuarioId) {
+      return res.status(400).json({ mensagem: "Usuário não informado" });
+    }
+
+    const pontuacao = await Pontuacao.findOne({ usuarioId });
+
+    res.json({
+      pontos: pontuacao ? pontuacao.pontos : 0
+    });
+
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
   }
-
-  res.json({
-    pontuacaoTotal: usuario.pontuacaoTotal
-  });
 };
