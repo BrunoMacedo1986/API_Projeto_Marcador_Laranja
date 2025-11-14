@@ -1,8 +1,7 @@
 const Pontuacao = require('../models/Pontuacao');
 const Usuario = require('../models/Usuario');
 
-
-// Criar registro inicial de pontuação (opcional)
+// ================= REGISTRAR PONTUAÇÃO INICIAL =================
 exports.registrar = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
@@ -16,27 +15,30 @@ exports.registrar = async (req, res) => {
     await nova.save();
 
     return res.status(201).json(nova);
-
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
 };
 
-
-// Incrementar pontos no usuário
+// ================= INCREMENTAR PONTUAÇÃO =================
 exports.incrementar = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
     const { pontos } = req.body;
 
-    if (!pontos) {
-      return res.status(400).json({ mensagem: "Informe os pontos" });
+    if (!pontos || pontos <= 0) {
+      return res.status(400).json({ mensagem: "Informe pontos válidos" });
     }
 
-    // Atualiza a pontuação acumulada do usuário
+    // Atualiza os campos pontuacaoTotal e pontuacaoAcum do usuário
     const usuario = await Usuario.findByIdAndUpdate(
       usuarioId,
-      { $inc: { pontuacaoTotal: pontos } },
+      { 
+        $inc: { 
+          pontuacaoTotal: pontos, 
+          pontuacaoAcum: pontos 
+        } 
+      },
       { new: true }
     );
 
@@ -44,7 +46,7 @@ exports.incrementar = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    // Registrar histórico no collection Pontuacao
+    // Registrar histórico na collection Pontuacao
     await Pontuacao.create({
       usuarioId,
       pontos
@@ -52,7 +54,8 @@ exports.incrementar = async (req, res) => {
 
     res.json({
       mensagem: "Pontuação atualizada",
-      pontuacaoTotal: usuario.pontuacaoTotal
+      pontuacaoTotal: usuario.pontuacaoTotal,
+      pontuacaoAcum: usuario.pontuacaoAcum
     });
 
   } catch (err) {
@@ -60,7 +63,7 @@ exports.incrementar = async (req, res) => {
   }
 };
 
-// Consultar pontuação acumulada
+// ================= CONSULTAR PONTUAÇÃO =================
 exports.consultar = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
@@ -71,7 +74,8 @@ exports.consultar = async (req, res) => {
     }
 
     res.json({
-      pontuacaoTotal: usuario.pontuacaoTotal
+      pontuacaoTotal: usuario.pontuacaoTotal,
+      pontuacaoAcum: usuario.pontuacaoAcum
     });
 
   } catch (err) {
