@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken');
-const Usuario = require('../models/Usuario');
-
 //module.exports = (req, res, next) => {
  // const token = req.headers.authorization?.split(' ')[1];
  // if (!token) return res.status(401).json({ mensagem: 'Token ausente' });
@@ -11,6 +8,8 @@ const Usuario = require('../models/Usuario');
  //   next();
  // });
 //};
+const jwt = require('jsonwebtoken');
+const Usuario = require('../models/Usuario');
 
 module.exports = async (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
