@@ -42,11 +42,10 @@ exports.incrementar = async (req, res) => {
     }
 
     // Registrar histórico na collection Pontuacao
-    await Pontuacao.create({ usuarioId, pontos });
+    await Pontuacao.create({ usuarioId, pontos, data: new Date() });
 
     res.json({
       mensagem: "Pontuação atualizada",
-      pontuacaoTotal: usuario.pontuacaoTotal ?? 0,
       pontuacaoAcum: usuario.pontuacaoAcum
     });
 
