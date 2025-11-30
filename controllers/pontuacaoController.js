@@ -46,14 +46,14 @@ exports.incrementar = async (req, res) => {
     // Incrementa também no usuário (se você mantém acumulado lá)
     const usuario = await Usuario.findByIdAndUpdate(
       usuarioId,
-      { $inc: { pontuacaoAcum: pontos } },
+      { $inc: { pontuacaoTotal: pontos } },
       { new: true }
     );
 
     res.json({
       mensagem: "Pontuação incrementada",
       novaPontuacao: pontuacao.pontos,
-      pontuacaoAcumUsuario: usuario?.pontuacaoAcum
+      pontuacaoAcumUsuario: usuario?.pontuacaoTotal
     });
 
   } catch (err) {
