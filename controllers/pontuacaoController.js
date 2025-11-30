@@ -6,11 +6,13 @@ exports.registrar = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
 
+    // Verifica se já existe um documento de pontuação para o usuário
     const existente = await Pontuacao.findOne({ usuarioId });
     if (existente) {
       return res.status(400).json({ mensagem: "Pontuação já existe" });
     }
 
+    // Cria a pontuação inicial
     const nova = new Pontuacao({ usuarioId, pontos: 0 });
     await nova.save();
 
@@ -30,23 +32,28 @@ exports.incrementar = async (req, res) => {
       return res.status(400).json({ mensagem: "Informe os pontos" });
     }
 
-    // Atualiza os campos pontuacaoTotal e pontuacaoAcum do usuário
-      const usuario = await Usuario.findByIdAndUpdate(
+    // Incrementa a pontuação na collection Pontuacao (único documento por usuário)
+    const pontuacao = await Pontuacao.findOneAndUpdate(
+      { usuarioId },
+      { $inc: { pontos } },
+      { new: true }
+    );
+
+    if (!pontuacao) {
+      return res.status(404).json({ mensagem: "Pontuação inicial não registrada" });
+    }
+
+    // Incrementa também no usuário (se você mantém acumulado lá)
+    const usuario = await Usuario.findByIdAndUpdate(
       usuarioId,
       { $inc: { pontuacaoAcum: pontos } },
       { new: true }
     );
 
-    if (!usuario) {
-      return res.status(404).json({ mensagem: "Usuário não encontrado" });
-    }
-
-    // Registrar histórico na collection Pontuacao
-    await Pontuacao.create({ usuarioId, pontos, data: new Date() });
-
     res.json({
-      mensagem: "Pontuação atualizada",
-      pontuacaoAcum: usuario.pontuacaoAcum
+      mensagem: "Pontuação incrementada",
+      novaPontuacao: pontuacao.pontos,
+      pontuacaoAcumUsuario: usuario?.pontuacaoAcum
     });
 
   } catch (err) {
@@ -59,6 +66,7 @@ exports.consultar = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
 
+    // Obtem do usuário campos de pontuação
     const usuario = await Usuario.findById(usuarioId);
     if (!usuario) {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
